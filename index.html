@@ -346,6 +346,7 @@
 
             <ul class="dl-checklist">
               <li><i class="fas fa-check"></i> Installer placeholder lives at <code style="font-family:var(--mono)">download/Lianwang-Setup-v1.1.0.exe</code> — swap it for your built app and this page updates itself.</li>
+              <li><i class="fas fa-check"></i> <strong>Installer bigger than 25&nbsp;MB?</strong> GitHub's web editor won't let you upload it to the repo. Attach it to a <a href="https://github.com/ykminmin8654/LianWang-Innovation-Earth-Projects/releases" data-external style="color:var(--teal);text-decoration:underline">GitHub Release</a> (Releases allow assets up to 2&nbsp;GB), then set <code style="font-family:var(--mono)">useExternalRelease: true</code> in <code style="font-family:var(--mono)">js/lianwang.js</code> — the buttons will download from Releases instead of this folder.</li>
               <li><i class="fas fa-check"></i> SmartScreen may warn on unsigned pre-release builds — that's expected while we're in development.</li>
               <li><i class="fas fa-check"></i> Re-running Setup lets you change installed tools later.</li>
             </ul>
@@ -361,6 +362,7 @@
                 </tr>
                 <tr><th>Platform</th><td>Windows 10 / 11 · x64</td></tr>
                 <tr><th>File</th><td style="font-family:var(--mono); font-size:0.78rem">Lianwang-Setup-v1.1.0.exe</td></tr>
+                <tr><th>Hosting</th><td>Repo file (&lt;25&nbsp;MB) or GitHub Release asset (up to 2&nbsp;GB)</td></tr>
                 <tr><th>Account</th><td>Not required</td></tr>
                 <tr><th>Data</th><td>Stored locally only</td></tr>
                 <tr><th>Price</th><td>Free during development</td></tr>
@@ -593,7 +595,7 @@
               <li><i class="fas fa-circle-notch"></i> Drive sync conflicts &amp; error states</li>
               <li><i class="fas fa-circle-notch"></i> Video Editor export performance</li>
               <li><i class="fas fa-circle-notch"></i> Installer signing (SmartScreen warnings)</li>
-              <li><i class="fas fa-circle-notch"></i> Replace placeholder .exe with real build</li>
+              <li><i class="fas fa-circle-notch"></i> Publish installer as a GitHub Release asset (&gt;25&nbsp;MB repo limit)</li>
             </ul>
           </div>
           <div class="roadmap__col roadmap__col--next reveal" data-delay="200">
@@ -646,6 +648,30 @@
               the page detects the stub and disables downloading on purpose so nobody
               gets a fake binary. Drop in your built app and the button activates
               automatically.
+            </p>
+          </details>
+
+          <details class="faq__item reveal">
+            <summary>My installer is bigger than 25&nbsp;MB — GitHub won't let me upload it. What now?</summary>
+            <p>
+              That's expected: GitHub blocks repo files over 25&nbsp;MB via the web
+              editor (and hard-blocks anything over 100&nbsp;MB). The fix is
+              <strong>GitHub Releases</strong>, which accept assets up to 2&nbsp;GB:
+            </p>
+            <ol style="margin:0 0 0.8rem 1.2rem">
+              <li>Open your repo → <em>Releases</em> → <em>Draft a new release</em>.</li>
+              <li>Name the tag <code style="font-family:var(--mono)">v1.1.0</code> and drag your
+                <code style="font-family:var(--mono)">Lianwang-Setup-v1.1.0.exe</code> into the
+                "attach binaries" area, then publish.</li>
+              <li>In <code style="font-family:var(--mono)">js/lianwang.js</code>, set
+                <code style="font-family:var(--mono)">useExternalRelease: true</code>. Optionally paste
+                the asset URL into <code style="font-family:var(--mono)">releaseDownloadUrl</code> —
+                otherwise the site finds the latest Release's .exe automatically.</li>
+            </ol>
+            <p>
+              The download buttons then point at your Release (same tab, no pop-ups), and the
+              tiny placeholder in this repo can stay as-is or be deleted. No Git LFS needed —
+              LFS has quota limits and still bloats the repo.
             </p>
           </details>
 

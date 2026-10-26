@@ -14,10 +14,51 @@
      ------------------------------------------------------------ */
   var LW = {
     version: '1.1.0',
-    downloadPath: 'download/Lianwang-Setup-v1.1.0.exe', // relative to site root
+    /* ---------------------------------------------------------------
+       HOW TO SHIP YOUR INSTALLER (it is too big for the web editor!)
+
+       A real .exe is almost always over GitHub's 25 MB limit for the
+       "Add files" web upload (and over git's 100 MB hard block). So:
+
+       1. Upload the installer to GitHub Releases instead:
+            Repo -> Releases -> Draft a new release -> attach the .exe
+          then copy the asset URL it gives you (looks like
+          https://github.com/<you>/<repo>/releases/download/v1.1.0/....exe)
+       2. Paste that URL into `releaseDownloadUrl` below and set
+          `useExternalRelease` to true. Done - buttons now download
+          from Releases; nothing needs to live inside this repo.
+       3. Optional but recommended: also create a Release *tag* named
+          after `releaseTagName` and keep `useExternalRelease: false`,
+          so links point at github.com/.../releases/latest automatically.
+
+       Leave `useExternalRelease` false while testing with the local
+       placeholder file in /download.
+       --------------------------------------------------------------- */
+    downloadPath: 'download/Lianwang-Setup-v1.1.0.exe', // relative to site root (placeholder path)
+    useExternalRelease: false,   // true => link straight to GitHub Releases (for >25MB installers)
+    releaseRepo: 'ykminmin8654/LianWang-Innovation-Earth-Projects', // <owner>/<repo> of your Releases
+    releaseTagName: 'v1.1.0',    // tag of the release holding the installer (used by ?asset= fallback)
+    releaseAssetName: 'Lianwang-Setup-v1.1.0.exe', // exact filename attached to the release
+    releaseDownloadUrl: '',      // paste full asset URL here & set useExternalRelease:true
     inDevelopment: true,        // master switch for all "in development" UI
     devProgress: 72             // % shown on the build-status bar
   };
+
+  function releaseLatestUrl() {
+    return 'https://github.com/' + LW.releaseRepo + '/releases/latest';
+  }
+  function releaseDirectUrl() {
+    if (LW.releaseDownloadUrl) return LW.releaseDownloadUrl;
+    if (LW.releaseTagName && LW.releaseAssetName) {
+      return 'https://github.com/' + LW.releaseRepo +
+        '/releases/download/' + encodeURIComponent(LW.releaseTagName.replace(/^v/, '')) +
+        '/' + encodeURIComponent(LW.releaseAssetName);
+    }
+    return releaseLatestUrl();
+  }
+  function activeDownloadHref() {
+    return LW.useExternalRelease ? releaseDirectUrl() : LW.downloadPath;
+  }
 
   /* The byte signature written into the placeholder file created in
      /download. If the served file still contains it, it has not been
@@ -138,6 +179,20 @@
   /* ------------------------------------------------------------
      3. DOWNLOAD CARD — placeholder detection + confirmation gate
      ------------------------------------------------------------ */
+  /* Keep every download button's href in sync with the chosen source:
+     local /download path while testing, GitHub Releases once the real
+     (over-25MB) installer lives there. */
+  function applyDownloadTargets() {
+    var href = activeDownloadHref();
+    $all('.dl-download').forEach(function (b) {
+      b.setAttribute('href', href);
+      if (b.dataset) b.dataset.href = href;
+      // `download` attr only works same-origin; drop it for external URLs.
+      if (LW.useExternalRelease) b.removeAttribute('download');
+      else b.setAttribute('download', '');
+    });
+  }
+
   function setDlState(state, extra) {
     var badge = $('#dl-state-badge');
     var note = $('#dl-note');
@@ -149,14 +204,17 @@
       badge.className = 'status status--soon';
       badge.innerHTML = '<span class="dot dot--soon"></span> Placeholder file';
       note.innerHTML = 'The installer at <code>' + LW.downloadPath + '</code> is still the <strong>placeholder</strong>. ' +
-        'Replace that file with your real build and this page will pick it up automatically. Until then, downloading is disabled.';
+        'Your real .exe is almost certainly bigger than GitHub\'s 25&nbsp;MB web-upload limit — don\'t commit it to this repo. ' +
+        'Attach it to a <a href="' + releaseLatestUrl() + '" style="color:var(--teal);text-decoration:underline">GitHub Release</a> instead, ' +
+        'then set <code>useExternalRelease: true</code> (and paste the asset URL) in <code>js/lianwang.js</code>. ' +
+        'Until then, downloading stays disabled.';
       btn.disabled = true;
       btn.innerHTML = '<i class="fas fa-hourglass-half"></i> Real build coming soon';
       setDlDisabled(true);
       if (heroNote) heroNote.innerHTML =
         '<i class="fas fa-triangle-exclamation" style="color:var(--warn)"></i> ' +
         'The app is <strong>still in development</strong> and the installer is a placeholder — ' +
-        'downloading unlocks when the real build replaces <code>' + LW.downloadPath + '</code>.';
+        'downloading unlocks when the real build is published (see the Download section).';
     } else if (state === 'ready') {
       badge.className = 'status status--dev';
       badge.innerHTML = '<span class="pulse-dot"></span> Pre-release build';
@@ -166,10 +224,30 @@
       btn.disabled = false;
       btn.innerHTML = '<i class="fas fa-download"></i> Download v' + LW.version + ' (.exe)';
       setDlDisabled(false);
+      applyDownloadTargets();
       if (heroNote) heroNote.innerHTML =
         '<i class="fas fa-triangle-exclamation" style="color:var(--warn)"></i> ' +
         'Pre-release build — the app is <strong>still in development</strong>. Installer: ' +
-        '<code>' + LW.downloadPath + '</code>' + (extra || '');
+        '<code>' + (LW.useExternalRelease ? 'GitHub Releases' : LW.downloadPath) + '</code>' + (extra || '');
+    } else if (state === 'external') {
+      /* Installer hosted on GitHub Releases (>25MB, never committed here).
+         We can't byte-inspect it cross-origin, so trust the config flag. */
+      badge.className = 'status status--dev';
+      badge.innerHTML = '<span class="pulse-dot"></span> Pre-release build · via GitHub Releases';
+      var sizeEl0 = $('#dl-size');
+      if (sizeEl0) sizeEl0.textContent = 'Hosted on GitHub Releases';
+      note.innerHTML = 'The real installer is attached to a <strong>GitHub Release</strong> of this repo ' +
+        '(it exceeds GitHub\'s 25&nbsp;MB per-file limit for repositories, so it does not live inside the site files). ' +
+        'The button opens the download in the same tab. Pre-release build — expect bugs: ' +
+        '<a href="mailto:InnovationEarthProjects@gmail.com" style="color:var(--teal);text-decoration:underline">email us</a>.';
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fas fa-download"></i> Download v' + LW.version + ' (.exe)';
+      setDlDisabled(false);
+      applyDownloadTargets();
+      if (heroNote) heroNote.innerHTML =
+        '<i class="fas fa-triangle-exclamation" style="color:var(--warn)"></i> ' +
+        'Pre-release build — the app is <strong>still in development</strong>. ' +
+        'Installer hosted on GitHub Releases.';
     } else if (state === 'checking') {
       badge.className = 'status status--soon';
       badge.innerHTML = '<span class="dot dot--soon"></span> Checking…';
@@ -177,6 +255,9 @@
   }
 
   function checkPlaceholder() {
+    /* Installer hosted on GitHub Releases (>25MB): skip the local byte
+       probe entirely — the file intentionally isn't in this repo. */
+    if (LW.useExternalRelease) { setDlState('external'); return; }
     if (!('fetch' in window)) { setDlState('ready'); return; }
     setDlState('checking');
     // HEAD first (cheap), fall back to ranged GET for file:// or servers without HEAD.
@@ -228,13 +309,13 @@
       b.classList.toggle('is-disabled', disabled);
       b.setAttribute('aria-disabled', disabled ? 'true' : 'false');
       if (disabled) { b.dataset.href = b.getAttribute('href') || ''; b.removeAttribute('href'); }
-      else { var h = b.dataset.href || LW.downloadPath; b.setAttribute('href', h); }
+      else { var h = b.dataset.href || activeDownloadHref(); b.setAttribute('href', h); }
     });
   }
 
   function wireDownloadButtons() {
     $all('.dl-download').forEach(function (btn) {
-      if (btn.tagName === 'A') btn.setAttribute('download', '');
+      if (!LW.useExternalRelease && btn.tagName === 'A') btn.setAttribute('download', '');
       btn.addEventListener('click', function (e) {
         if (btn.classList.contains('is-disabled') || btn.disabled) {
           e.preventDefault();
@@ -325,11 +406,55 @@
     });
   }
 
+  /* ------------------------------------------------------------
+     4b. RELEASES CHECK — when hosting on GitHub Releases, verify the
+         latest release actually carries the installer asset (same-tab
+         policy is preserved: we never window.open anything).
+     ------------------------------------------------------------ */
+  function checkReleaseStatus() {
+    if (!LW.useExternalRelease) return;
+    var badge = $('#dl-state-badge');
+    var api = 'https://api.github.com/repos/' + LW.releaseRepo + '/releases/latest';
+    if (!('fetch' in window)) return;
+    fetch(api)
+      .then(function (r) {
+        if (!r.ok) throw new Error('no release yet');
+        return r.json();
+      })
+      .then(function (rel) {
+        var hit = (rel.assets || []).filter(function (a) {
+          return a.name === LW.releaseAssetName || /\.exe$/i.test(a.name);
+        })[0];
+        if (hit && !LW.releaseDownloadUrl) {
+          LW.releaseDownloadUrl = hit.browser_download_url;
+          applyDownloadTargets();
+        }
+        if (badge) {
+          badge.className = 'status status--dev';
+          badge.innerHTML = '<span class="pulse-dot"></span> Pre-release build · Release ' +
+            (rel.tag_name || '') + ' live';
+        }
+        var sizeEl = $('#dl-size');
+        if (sizeEl && hit) {
+          var mb = hit.size / (1024 * 1024);
+          sizeEl.textContent = mb >= 1 ? mb.toFixed(1) + ' MB · via GitHub Releases' : 'via GitHub Releases';
+        }
+      })
+      .catch(function () {
+        if (badge) {
+          badge.className = 'status status--soon';
+          badge.innerHTML = '<span class="dot dot--soon"></span> Release not published yet';
+        }
+      });
+  }
+
   document.addEventListener('DOMContentLoaded', function () {
     buildNav();
     buildFooter();
     renderTools();
+    applyDownloadTargets();
     checkPlaceholder();
+    checkReleaseStatus();
     wireDownloadButtons();
     initMotion();
     animateProgressBars();
