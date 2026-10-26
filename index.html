@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Liánwǎng — Local-first desktop workspace (in development)</title>
+  <meta name="description" content="Liánwǎng is a local-first Windows desktop workspace: tasks, calendar, notes, video editor, watermark tools, editors and utilities. All data stays on your PC. Currently in active development." />
+  <meta name="theme-color" content="#008080" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap"
+    rel="stylesheet"
+  />
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+  />
+
+  <link rel="stylesheet" href="shared/tokens.css" />
+  <link rel="stylesheet" href="shared/base.css" />
+  <link rel="stylesheet" href="shared/nav.css" />
+  <link rel="stylesheet" href="shared/motion.css" />
+  <link rel="stylesheet" href="css/lianwang.css" />
+  <link rel="icon" type="image/png" href="images/logo.png" />
+</head>
+
+<body data-page="lianwang">
+
+  <div class="bg-orbs" aria-hidden="true">
+    <span class="orb orb--teal"></span>
+    <span class="orb orb--cyan"></span>
+    <span class="orb orb--lime"></span>
+  </div>
+
+  <!-- No-JS fallback: keep the "in development" warning visible even if scripts fail -->
+  <noscript>
+    <div class="dev-ribbon">
+      <i class="fas fa-hammer" aria-hidden="true"></i>
+      Liánwǎng is <strong>still in active development</strong> — v1.1.0 builds are pre-release and the installer below is a placeholder file.
+    </div>
+    <header class="nav"><div class="nav__inner">
+      <a href="index.html" class="nav__brand">
+        <span class="nav__mark"><img src="images/logo.png" alt="" width="32" height="32" class="nav__logo-img" /></span>
+        <span class="nav__wordmark">Liánwǎng</span>
+        <span class="nav__version">v1.1.0 · dev</span>
+      </a>
+      <nav class="nav__links" aria-label="Primary">
+        <a href="#tools">Tools</a><a href="#download">Download</a><a href="#privacy">Privacy</a><a href="#roadmap">Roadmap</a><a href="#faq">FAQ</a>
+      </nav>
+    </div></header>
+  </noscript>
+
+  <!-- Nav + "still in development" ribbon injected by js/lianwang.js -->
+  <div id="nav-mount"></div>
+
+  <main>
+
+    <!-- ============================================================
+         1. HERO
+         ============================================================ -->
+    <section class="hero">
+      <div class="container hero__grid">
+
+        <div class="hero__copy">
+          <span class="eyebrow eyebrow--animated">
+            <span class="eyebrow__dot"></span>
+            Still in development · v1.1.0 pre-release
+          </span>
+
+          <h1 class="hero__title">
+            <span class="reveal">Your desk,</span><br />
+            <span class="reveal accent-shimmer accent-shimmer--dev">one local app.</span>
+          </h1>
+
+          <p class="hero__lede reveal" data-delay="200">
+            Liánwǎng (联网 — “connected network”) bundles tasks, calendar, notes,
+            a video editor, watermark tools, file &amp; code editors and everyday
+            utilities into one keyboard-driven Windows desktop app.
+            No accounts. No cloud. Your work never leaves your PC.
+          </p>
+
+          <div class="hero__actions reveal" data-delay="400">
+            <a
+              href="download/Lianwang-Setup-v1.1.0.exe"
+              download
+              class="btn btn--primary btn--lg btn--glow dl-download"
+              id="dl-btn"
+            ><i class="fas fa-download"></i> Download v1.1.0 (.exe)</a>
+            <a href="#tools" class="btn btn--secondary btn--lg">Explore the tools</a>
+          </div>
+
+          <p class="hero__dl-note reveal" data-delay="400" id="hero-dl-note">
+            <i class="fas fa-triangle-exclamation" style="color:var(--warn)"></i>
+            Pre-release build — the app is still being finished. Installer:
+            <code>download/Lianwang-Setup-v1.1.0.exe</code>
+          </p>
+
+          <ul class="hero__meta reveal" data-delay="600">
+            <li><i class="fas fa-check"></i> No ads</li>
+            <li><i class="fas fa-check"></i> No tracking</li>
+            <li><i class="fas fa-check"></i> No account required</li>
+          </ul>
+        </div>
+
+        <div class="hero__visual reveal">
+          <div class="app-window">
+            <span class="app-window__stamp"><i class="fas fa-hammer"></i> In development</span>
+            <div class="app-window__bar">
+              <span></span><span></span><span></span>
+              <span class="app-window__title">Liánwǎng — Home</span>
+            </div>
+            <div class="app-window__body">
+              <aside class="app-sb">
+                <span class="app-sb__item is-active"><i class="fas fa-house"></i> Home</span>
+                <span class="app-sb__item"><i class="fas fa-list-check"></i> Tasks</span>
+                <span class="app-sb__item"><i class="fas fa-calendar-days"></i> Calendar</span>
+                <span class="app-sb__item"><i class="fas fa-note-sticky"></i> Notes</span>
+                <span class="app-sb__item"><i class="fas fa-film"></i> Video Editor</span>
+                <span class="app-sb__item"><i class="fas fa-stamp"></i> Watermarks</span>
+                <span class="app-sb__spacer"></span>
+                <span class="app-sb__gear"><i class="fas fa-gear"></i> Settings</span>
+              </aside>
+              <div class="app-main">
+                <div class="app-main__greet">Good morning 👋 here's today.</div>
+                <div class="app-stats">
+                  <div class="app-stat"><b>12</b><span>To do</span></div>
+                  <div class="app-stat"><b>4</b><span>Doing</span></div>
+                  <div class="app-stat"><b>27</b><span>Done</span></div>
+                  <div class="app-stat"><b>3</b><span>Due</span></div>
+                </div>
+                <div class="app-board">
+                  <div class="app-col">
+                    <h5>Not started</h5>
+                    <div class="app-card"><span class="app-card__prio"></span><div class="app-card__line app-card__line--lg"></div><div class="app-card__line app-card__line--sm"></div></div>
+                    <div class="app-card"><div class="app-card__line app-card__line--lg"></div><div class="app-card__line app-card__line--sm"></div></div>
+                  </div>
+                  <div class="app-col">
+                    <h5>In progress</h5>
+                    <div class="app-card"><div class="app-card__line app-card__line--lg"></div><div class="app-card__line app-card__line--sm"></div></div>
+                  </div>
+                  <div class="app-col">
+                    <h5>Done</h5>
+                    <div class="app-card"><div class="app-card__line app-card__line--lg"></div><div class="app-card__line app-card__line--sm"></div></div>
+                    <div class="app-card"><div class="app-card__line app-card__line--sm"></div></div>
+                  </div>
+                </div>
+                <div class="app-chips">
+                  <span>Timer</span><span>Calculator</span><span>Units</span><span>Formatter</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="hero__float hero__float--1"><i class="fas fa-list-check"></i></div>
+          <div class="hero__float hero__float--2"><i class="fas fa-film"></i></div>
+          <div class="hero__float hero__float--3"><i class="fas fa-keyboard"></i></div>
+          <div class="hero__float hero__float--dev"><i class="fas fa-hammer"></i></div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ============================================================
+         2. DEVELOPMENT BANNER — the app is NOT finished
+         ============================================================ -->
+    <section class="dev-banner" id="development">
+      <div class="container dev-banner__inner">
+        <div class="dev-banner__icon" aria-hidden="true"><i class="fas fa-hammer"></i></div>
+        <div class="dev-banner__copy">
+          <h2>Heads up: Liánwǎng is still in active development</h2>
+          <p>
+            This page documents the planned v1.1.0 experience from the user guide.
+            Some tools are finished, some are mid-build, and the installer currently
+            available for download is a <strong>placeholder file</strong> that will be
+            swapped for the real app before launch. Expect rough edges — and please
+            report them.
+          </p>
+        </div>
+        <div class="dev-banner__progress">
+          <div class="dev-banner__progress-label">
+            <span>Build status</span><span>72% shipped</span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill" data-width="72" role="img" aria-label="72 percent of planned features shipped"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         3. TRUST BAR
+         ============================================================ -->
+    <section class="trust-bar">
+      <div class="container trust-bar__inner">
+        <span class="trust-bar__label">Everything lives on your machine —</span>
+        <div class="trust-bar__logos">
+          <span>Tasks</span>
+          <span>Notes</span>
+          <span>Videos</span>
+          <span>Code</span>
+          <span>Passwords</span>
+          <span>Calendars</span>
+          <span>Colors</span>
+          <span>JSON</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         4. TOOLS GRID
+         ============================================================ -->
+    <section class="section" id="tools">
+      <div class="container">
+        <header class="section__head reveal">
+          <span class="eyebrow">The toolbox</span>
+          <h2 class="section__title">Every tool, one sidebar</h2>
+          <p class="section__lede">
+            <strong><span id="tool-count">15</span> tools</strong> ship in the v1.1.0 plan —
+            pick any subset during setup with a preset or custom selection.
+            Every card below is stamped <em>Dev build</em> until it's signed off.
+          </p>
+        </header>
+
+        <div class="grid-tools" id="tools-grid">
+          <!-- Rendered by js/lianwang.js from js/tools-data.js -->
+        </div>
+
+        <div class="center-cta">
+          <a href="#setup" class="btn btn--secondary">
+            How setup works <i class="fas fa-arrow-right"></i>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         5. SETUP — presets + first run (README §1)
+         ============================================================ -->
+    <section class="section section--tint" id="setup">
+      <div class="container">
+        <header class="section__head reveal">
+          <span class="eyebrow">Getting started</span>
+          <h2 class="section__title">Run Setup once, then open the app</h2>
+          <p class="section__lede">
+            From the planned user guide: choose a preset, wait for the first-run
+            configuration, and pin what you use most to the sidebar.
+          </p>
+        </header>
+
+        <ol class="steps">
+          <li class="step reveal" data-delay="100">
+            <span class="step__num">01</span>
+            <h3 class="step__title">Run Setup</h3>
+            <p class="step__desc">
+              Launch <code>Lianwang-Setup-v1.1.0.exe</code>, accept the license and
+              keep the default install location unless you need another drive.
+            </p>
+          </li>
+          <li class="step reveal" data-delay="200">
+            <span class="step__num">02</span>
+            <h3 class="step__title">Pick a preset</h3>
+            <p class="step__desc">
+              Essential · Focus · Creator · Image &amp; Media · Utilities · All Tools —
+              or Custom to select each tool yourself.
+            </p>
+          </li>
+          <li class="step reveal" data-delay="300">
+            <span class="step__num">03</span>
+            <h3 class="step__title">Wait for first run</h3>
+            <p class="step__desc">
+              The welcome screen configures selected tools and storage. Don't close
+              the window — later launches skip straight to Home.
+            </p>
+          </li>
+          <li class="step reveal" data-delay="400">
+            <span class="step__num">04</span>
+            <h3 class="step__title">Make it yours</h3>
+            <p class="step__desc">
+              Settings → Appearance for themes, Settings → Tools to add or remove
+              tools, drag items in the sidebar to pin your daily set.
+            </p>
+          </li>
+        </ol>
+
+        <div class="callout callout--warn reveal mt-7" style="margin-top:var(--s-7)">
+          <div class="callout__mark" aria-hidden="true"><i class="fas fa-flask"></i></div>
+          <div class="callout__body">
+            <h3>Development note on presets</h3>
+            <p>
+              Preset names and contents shown here match the v1.1.0 user guide and may
+              change before release. The Drive tool remains hidden — it isn't part of
+              normal installation yet, and its status is tracked on the roadmap below.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         6. DOWNLOAD (placeholder exe lives here)
+         ============================================================ -->
+    <section class="section" id="download">
+      <div class="container">
+        <header class="section__head reveal">
+          <span class="eyebrow">Download</span>
+          <h2 class="section__title">Get the Windows installer</h2>
+          <p class="section__lede">
+            One .exe, no telemetry installer wrappers. Windows 10/11, x64.
+          </p>
+        </header>
+
+        <div class="dl-box reveal">
+          <div>
+            <div class="dl-file">
+              <div class="dl-file__icon"><i class="fab fa-windows"></i></div>
+              <div>
+                <div class="dl-file__name">Lianwang-Setup-v1.1.0.exe</div>
+                <div class="dl-file__meta">
+                  <span id="dl-size">— size detected on load</span> ·
+                  Windows 10 / 11 (x64)
+                  <span class="status status--soon" id="dl-state-badge">
+                    <span class="dot dot--soon"></span> Checking…
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div class="dl-actions">
+              <a
+                href="download/Lianwang-Setup-v1.1.0.exe"
+                download
+                class="btn btn--primary btn--lg btn--glow dl-download"
+                id="dl-btn-bottom"
+              ><i class="fas fa-download"></i> Download v1.1.0 (.exe)</a>
+              <a href="#faq" class="btn btn--ghost btn--lg">Read the FAQ first</a>
+            </div>
+
+            <p class="hero__dl-note" id="dl-note" style="margin-top:var(--s-4); max-width:52ch">
+              <i class="fas fa-triangle-exclamation" style="color:var(--warn)"></i>
+              The installer at <code>download/Lianwang-Setup-v1.1.0.exe</code> is a
+              <strong>placeholder</strong> until the real build ships — downloading stays
+              disabled until then.
+            </p>
+
+            <ul class="dl-checklist">
+              <li><i class="fas fa-check"></i> Installer placeholder lives at <code style="font-family:var(--mono)">download/Lianwang-Setup-v1.1.0.exe</code> — swap it for your built app and this page updates itself.</li>
+              <li><i class="fas fa-check"></i> SmartScreen may warn on unsigned pre-release builds — that's expected while we're in development.</li>
+              <li><i class="fas fa-check"></i> Re-running Setup lets you change installed tools later.</li>
+            </ul>
+          </div>
+
+          <div class="dl-side">
+            <h3>Release table</h3>
+            <table class="dl-side__table">
+              <tbody>
+                <tr><th>Version</th><td>v1.1.0</td></tr>
+                <tr><th>Status</th>
+                  <td><span class="status status--dev"><span class="pulse-dot"></span> In development</span></td>
+                </tr>
+                <tr><th>Platform</th><td>Windows 10 / 11 · x64</td></tr>
+                <tr><th>File</th><td style="font-family:var(--mono); font-size:0.78rem">Lianwang-Setup-v1.1.0.exe</td></tr>
+                <tr><th>Account</th><td>Not required</td></tr>
+                <tr><th>Data</th><td>Stored locally only</td></tr>
+                <tr><th>Price</th><td>Free during development</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         7. PRIVACY / WHY LOCAL-FIRST
+         ============================================================ -->
+    <section class="section section--tint" id="privacy">
+      <div class="container">
+        <header class="section__head reveal">
+          <span class="eyebrow">Privacy</span>
+          <h2 class="section__title">Local-first, private by default</h2>
+          <p class="section__lede">
+            Straight from the user guide: every workflow runs on your machine.
+          </p>
+        </header>
+
+        <div class="reasons">
+          <div class="reason reveal" data-delay="100">
+            <div class="reason__icon reason__icon--teal"><i class="fas fa-hard-drive"></i></div>
+            <h3 class="reason__title">Data stays on your PC</h3>
+            <p class="reason__desc">
+              Tasks, calendar entries, notes and passwords are stored locally —
+              not uploaded to anyone's servers.
+            </p>
+          </div>
+          <div class="reason reveal" data-delay="200">
+            <div class="reason__icon reason__icon--cyan"><i class="fas fa-user-lock"></i></div>
+            <h3 class="reason__title">No account, ever</h3>
+            <p class="reason__desc">
+              There is no sign-in flow, no email capture and no ad SDK in the
+              planned release.
+            </p>
+          </div>
+          <div class="reason reveal" data-delay="300">
+            <div class="reason__icon reason__icon--lime"><i class="fas fa-scissors"></i></div>
+            <h3 class="reason__title">Media processed locally</h3>
+            <p class="reason__desc">
+              Video editing, watermark removal and password generation all happen
+              on-device. Nothing is uploaded.
+            </p>
+          </div>
+          <div class="reason reveal" data-delay="400">
+            <div class="reason__icon reason__icon--warn"><i class="fas fa-clock-rotate-left"></i></div>
+            <h3 class="reason__title">Recoverable by design</h3>
+            <p class="reason__desc">
+              Autosave, Trash restore, undo history and JSON/CSV task export mean
+              your work survives mistakes.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         8. THEMES
+         ============================================================ -->
+    <section class="section">
+      <div class="container">
+        <header class="section__head reveal">
+          <span class="eyebrow">Appearance</span>
+          <h2 class="section__title">Six themes, instant switch</h2>
+          <p class="section__lede">
+            Settings → Appearance applies immediately. Sidebar colours follow your theme.
+          </p>
+        </header>
+
+        <div class="themes">
+          <div class="theme-swatch reveal" data-delay="100">
+            <div class="theme-swatch__strip">
+              <span style="background:#FFFFFF"></span><span style="background:#E1EDEF"></span><span style="background:#008080"></span>
+            </div>
+            <span class="theme-swatch__name">Light</span><span class="theme-swatch__hint">Default</span>
+          </div>
+          <div class="theme-swatch reveal" data-delay="150">
+            <div class="theme-swatch__strip">
+              <span style="background:#0B1A1F"></span><span style="background:#12262C"></span><span style="background:#00CED1"></span>
+            </div>
+            <span class="theme-swatch__name">Dark</span><span class="theme-swatch__hint">Night sessions</span>
+          </div>
+          <div class="theme-swatch reveal" data-delay="200">
+            <div class="theme-swatch__strip">
+              <span style="background:#0E1116"></span><span style="background:#1B1F27"></span><span style="background:#32CD32"></span>
+            </div>
+            <span class="theme-swatch__name">Midnight Green</span><span class="theme-swatch__hint">Signature</span>
+          </div>
+          <div class="theme-swatch reveal" data-delay="250">
+            <div class="theme-swatch__strip">
+              <span style="background:#041014"></span><span style="background:#0A2A33"></span><span style="background:#00CED1"></span>
+            </div>
+            <span class="theme-swatch__name">Ocean Teal</span><span class="theme-swatch__hint">Deep contrast</span>
+          </div>
+          <div class="theme-swatch reveal" data-delay="300">
+            <div class="theme-swatch__strip">
+              <span style="background:#FFF8E7"></span><span style="background:#F3E3BF"></span><span style="background:#C68A00"></span>
+            </div>
+            <span class="theme-swatch__name">Sepia Warm</span><span class="theme-swatch__hint">Long reading</span>
+          </div>
+          <div class="theme-swatch reveal" data-delay="350">
+            <div class="theme-swatch__strip">
+              <span style="background:#FFFFFF"></span><span style="background:#000000"></span><span style="background:#1E90FF"></span>
+            </div>
+            <span class="theme-swatch__name">High Contrast</span><span class="theme-swatch__hint">Accessibility</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         9. KEYBOARD SHORTCUTS
+         ============================================================ -->
+    <section class="section section--tint">
+      <div class="container">
+        <header class="section__head reveal">
+          <span class="eyebrow">Keyboard-first</span>
+          <h2 class="section__title">Shortcuts from the guide</h2>
+          <p class="section__lede">
+            Press <kbd>Ctrl</kbd>+<kbd>/</kbd> inside the app for the full list.
+          </p>
+        </header>
+
+        <div class="shortcuts">
+          <div class="shortcut-group reveal" data-delay="100">
+            <h3><i class="fas fa-route"></i> Navigation</h3>
+            <div class="shortcut-row"><span>Go to Home</span><kbd>Ctrl</kbd>+<kbd>1</kbd></div>
+            <div class="shortcut-row"><span>Go to Tasks</span><kbd>Ctrl</kbd>+<kbd>2</kbd></div>
+            <div class="shortcut-row"><span>Go to Calendar</span><kbd>Ctrl</kbd>+<kbd>3</kbd></div>
+            <div class="shortcut-row"><span>Go to Notes</span><kbd>Ctrl</kbd>+<kbd>4</kbd></div>
+            <div class="shortcut-row"><span>Search across tools</span><kbd>Ctrl</kbd>+<kbd>K</kbd></div>
+            <div class="shortcut-row"><span>List of shortcuts</span><kbd>Ctrl</kbd>+<kbd>/</kbd></div>
+          </div>
+          <div class="shortcut-group reveal" data-delay="200">
+            <h3><i class="fas fa-pen"></i> Editing</h3>
+            <div class="shortcut-row"><span>New note</span><kbd>Ctrl</kbd>+<kbd>N</kbd></div>
+            <div class="shortcut-row"><span>Save current item</span><kbd>Ctrl</kbd>+<kbd>S</kbd></div>
+            <div class="shortcut-row"><span>Undo</span><kbd>Ctrl</kbd>+<kbd>Z</kbd></div>
+            <div class="shortcut-row"><span>Redo</span><kbd>Ctrl</kbd>+<kbd>Y</kbd></div>
+            <div class="shortcut-row"><span>Close active tool</span><kbd>Esc</kbd></div>
+          </div>
+          <div class="shortcut-group reveal" data-delay="300">
+            <h3><i class="fas fa-clapperboard"></i> Media &amp; Timer</h3>
+            <div class="shortcut-row"><span>Play / pause media</span><kbd>Space</kbd></div>
+            <div class="shortcut-row"><span>Move back / forward</span><kbd>←</kbd> <kbd>→</kbd></div>
+            <div class="shortcut-row"><span>Start timer</span><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>T</kbd></div>
+            <div class="shortcut-row"><span>Stop timer</span><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd></div>
+            <div class="shortcut-row"><span>Reset timer</span><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>R</kbd></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         10. CHANGELOG
+         ============================================================ -->
+    <section class="section">
+      <div class="container">
+        <header class="section__head reveal">
+          <span class="eyebrow">Recently shipped</span>
+          <h2 class="section__title">Changelog</h2>
+          <p class="section__lede">We build in public. Every entry has a date.</p>
+        </header>
+
+        <ul class="changelog">
+          <li class="changelog__item changelog__item--dev reveal">
+            <span class="changelog__date">Oct 2026 — in progress</span>
+            <h3 class="changelog__title">v1.1.0 user guide written</h3>
+            <p class="changelog__desc">
+              Full per-tool walkthrough documented: setup presets, navigation,
+              Tasks board, Calendar, Notes, Video Editor, watermark tools, editors
+              and utilities.
+            </p>
+          </li>
+          <li class="changelog__item changelog__item--dev reveal">
+            <span class="changelog__date">Oct 2026 — in progress</span>
+            <h3 class="changelog__title">Drive integration hardening</h3>
+            <p class="changelog__desc">
+              Hidden Drive tool under active work: folder picker, sync queue,
+              conflict handling and error states. Not enabled for normal installs.
+            </p>
+          </li>
+          <li class="changelog__item reveal">
+            <span class="changelog__date">Oct 2026</span>
+            <h3 class="changelog__title">Watermark Adder presets</h3>
+            <p class="changelog__desc">
+              Corner, Subtle, Bold and Tiled presets with nine anchor positions,
+              rotation and margin controls.
+            </p>
+          </li>
+          <li class="changelog__item reveal">
+            <span class="changelog__date">Sep 2026</span>
+            <h3 class="changelog__title">Local healing for Watermark Remover</h3>
+            <p class="changelog__desc">
+              Mask brush with zoom, edge expansion, texture-aware and smooth fills —
+              entirely on-device.
+            </p>
+          </li>
+          <li class="changelog__item reveal">
+            <span class="changelog__date">Aug 2026</span>
+            <h3 class="changelog__title">Theme engine</h3>
+            <p class="changelog__desc">
+              Six themes including Midnight Green and Ocean Teal; appearance changes
+              apply instantly.
+            </p>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         11. ROADMAP
+         ============================================================ -->
+    <section class="section section--tint" id="roadmap">
+      <div class="container">
+        <header class="section__head reveal">
+          <span class="eyebrow">Roadmap</span>
+          <h2 class="section__title">What's left before 1.0 ships</h2>
+          <p class="section__lede">Honest statuses — this app is not finished yet.</p>
+        </header>
+
+        <div class="roadmap">
+          <div class="roadmap__col roadmap__col--now reveal" data-delay="100">
+            <div class="roadmap__head"><i class="fas fa-hammer"></i> Building now</div>
+            <ul class="roadmap__list">
+              <li><i class="fas fa-circle-notch"></i> Drive sync conflicts &amp; error states</li>
+              <li><i class="fas fa-circle-notch"></i> Video Editor export performance</li>
+              <li><i class="fas fa-circle-notch"></i> Installer signing (SmartScreen warnings)</li>
+              <li><i class="fas fa-circle-notch"></i> Replace placeholder .exe with real build</li>
+            </ul>
+          </div>
+          <div class="roadmap__col roadmap__col--next reveal" data-delay="200">
+            <div class="roadmap__head"><i class="fas fa-cube"></i> Next up</div>
+            <ul class="roadmap__list">
+              <li><i class="fas fa-clock"></i> Auto-update channel for stable builds</li>
+              <li><i class="fas fa-clock"></i> Per-tool keyboard override maps</li>
+              <li><i class="fas fa-clock"></i> Backup &amp; restore wizard (local archive)</li>
+              <li><i class="fas fa-clock"></i> Public beta opt-in from Settings</li>
+            </ul>
+          </div>
+          <div class="roadmap__col roadmap__col--later reveal" data-delay="300">
+            <div class="roadmap__head"><i class="fas fa-seedling"></i> Later</div>
+            <ul class="roadmap__list">
+              <li><i class="far fa-circle"></i> Optional encrypted multi-device sync</li>
+              <li><i class="far fa-circle"></i> Plugin API for community tools</li>
+              <li><i class="far fa-circle"></i> macOS &amp; Linux evaluation</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         12. FAQ
+         ============================================================ -->
+    <section class="section" id="faq">
+      <div class="container">
+        <header class="section__head reveal">
+          <span class="eyebrow">Questions</span>
+          <h2 class="section__title">Frequently asked</h2>
+        </header>
+
+        <div class="faq">
+          <details class="faq__item reveal">
+            <summary>Is Liánwǎng finished?</summary>
+            <p>
+              No — it is <strong>still in active development</strong>. The v1.1.0 user
+              guide describes the planned experience, and parts of it (Drive, some
+              export flows, the installer signature) are not final yet. Everything you
+              read here is marked as pre-release.
+            </p>
+          </details>
+
+          <details class="faq__item reveal">
+            <summary>Why does the download button look disabled?</summary>
+            <p>
+              Until the real installer replaces the placeholder file at
+              <code style="font-family:var(--mono)">download/Lianwang-Setup-v1.1.0.exe</code>,
+              the page detects the stub and disables downloading on purpose so nobody
+              gets a fake binary. Drop in your built app and the button activates
+              automatically.
+            </p>
+          </details>
+
+          <details class="faq__item reveal">
+            <summary>Does it need an account or internet?</summary>
+            <p>
+              Neither. Tasks, calendar, notes, passwords, video projects and edits are
+              stored locally on your PC. Internet access is optional and used only if
+              you enable Drive-style syncing later.
+            </p>
+          </details>
+
+          <details class="faq__item reveal">
+            <summary>Which Windows versions are supported?</summary>
+            <p>
+              Windows 10 and 11 on x64 machines. Run the Setup file, choose a preset
+              (or Custom), and let the first-run configuration finish without closing
+              the window.
+            </p>
+          </details>
+
+          <details class="faq__item reveal">
+            <summary>Can I change which tools are installed?</summary>
+            <p>
+              Yes — Settings → Tools adds or removes tools, and re-running Setup offers
+              the same choice. The sidebar shows everything currently enabled.
+            </p>
+          </details>
+
+          <details class="faq__item reveal">
+            <summary>Can I try the unreleased tools?</summary>
+            <p>
+              When the beta build is published, early-access builds will be offered to
+              testers. Email
+              <a href="mailto:InnovationEarthProjects@gmail.com">InnovationEarthProjects@gmail.com</a>
+              and tell us which tool you want to break first.
+            </p>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         13. FINAL CTA
+         ============================================================ -->
+    <section class="section">
+      <div class="container">
+        <div class="cta reveal">
+          <div class="cta__copy">
+            <h2>Join the development, not just the launch.</h2>
+            <p>Pre-release downloads are free — bugs included. Feedback shapes v1.0.</p>
+          </div>
+          <a href="#download" class="btn btn--primary btn--glow">
+            Go to download <i class="fas fa-arrow-right"></i>
+          </a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer injected by js/lianwang.js -->
+  <div id="footer-mount"></div>
+
+  <script src="js/tools-data.js" defer></script>
+  <script src="js/lianwang.js" defer></script>
+
+</body>
+</html>
