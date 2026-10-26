@@ -13,41 +13,41 @@
      CONFIG — edit these when you ship a new build
      ------------------------------------------------------------ */
   var LW = {
-    version: '1.1.0',
+    version: '1.1.1',
     /* ---------------------------------------------------------------
-       SHIPPING MODEL (current): the portable .zip on GitHub Releases
-       is the ONLY download option. No .exe installer exists.
+       SHIPPING MODEL (current): the Setup .exe on GitHub Releases is
+       the ONLY download option. The old portable .zip is retired.
 
-       Why: the build exceeds GitHub's 25 MB per-file repo limit, so it
-       lives as a Release asset (Releases accept up to 2 GB). To ship a
-       new version:
-         1. Repo -> Releases -> Draft a new release -> attach the zip
+       Why: the build (~140 MB) exceeds GitHub's 25 MB per-file repo
+       limit, so it lives as a Release asset (Releases accept up to
+       2 GB). To ship a new version:
+         1. Repo -> Releases -> Draft a new release -> attach the .exe
          2. Update `version`, `releaseTagName` and `releaseAssetName`
             below (or leave releaseDownloadUrl empty and the site will
-            auto-detect the newest Release's zip via the GitHub API).
+            auto-detect the newest Release's .exe via the GitHub API).
 
        `useExternalRelease: true` = download comes from Releases.
        Setting it back to false only makes sense if you commit a small
        test package under download/ again.
        --------------------------------------------------------------- */
-    downloadPath: 'download/Lianwang-v1.1.0-Web-Installer.zip', // legacy local path (unused while external mode is on)
-    useExternalRelease: true,    // THE zip on GitHub Releases is the only download
+    downloadPath: 'download/Lianwang-Setup-1.1.1.exe', // legacy local path (unused while external mode is on)
+    useExternalRelease: true,    // THE .exe on GitHub Releases is the only download
     releaseRepo: 'ykminmin8654/LianWang-Innovation-Earth-Projects', // <owner>/<repo> of your Releases
-    releaseTagName: 'ZIP',       // tag of the release holding the zip
-    releaseAssetName: 'Lianwang-v1.1.0-Web-Installer.zip', // exact zip filename attached to the release
-    /* Pinned to the published asset (release tag "ZIP"). Verified live —
-       if you re-publish under a new tag/asset name, update this URL or
-       empty it and the site will auto-detect the latest Release's zip. */
-    releaseDownloadUrl: 'https://github.com/ykminmin8654/LianWang-Innovation-Earth-Projects/releases/download/ZIP/Lianwang-v1.1.0-Web-Installer.zip',
-    appExeName: '',             // main .exe INSIDE the zip (auto-detected from the asset name; set explicitly to override)
+    releaseTagName: 'install',   // tag of the release holding the setup exe
+    releaseAssetName: 'Lianwang-Setup-1.1.1.exe', // exact .exe filename attached to the release
+    /* Pinned to the published asset (release tag "install"). Verified
+       live (HTTP 200, ~140 MB) — if you re-publish under a new tag or
+       asset name, update this URL or empty it and the site will
+       auto-detect the latest Release's .exe. */
+    releaseDownloadUrl: 'https://github.com/ykminmin8654/LianWang-Innovation-Earth-Projects/releases/download/install/Lianwang-Setup-1.1.1.exe',
+    appExeName: '',             // display name of the program (derived from the asset name; set explicitly to override)
     inDevelopment: true,        // master switch for all "in development" UI
     devProgress: 72             // % shown on the build-status bar
   };
 
-  /* Name of the program users launch after extracting the zip —
-     derived from the asset filename so the copy stays truthful even
-     when the package is named "...-Web-Installer.zip". Override with
-     LW.appExeName if the inner exe differs. */
+  /* Display name of the program users run — derived from the asset
+     filename (a Setup .exe runs itself; a zip would be extracted
+     first). Override with LW.appExeName if it differs. */
   function appExeName() {
     if (LW.appExeName) return LW.appExeName;
     var src = (LW.releaseDownloadUrl || LW.releaseAssetName || LW.downloadPath).split('/').pop();
@@ -258,16 +258,18 @@
         'Pre-release build — the app is <strong>still in development</strong>. Installer: ' +
         '<code>' + (LW.useExternalRelease ? 'GitHub Releases' : LW.downloadPath) + '</code>' + (extra || '');
     } else if (state === 'external') {
-      /* The portable .zip lives on GitHub Releases (>25MB, never
-         committed to this repo). It is the ONLY download option —
-         there is no .exe installer. */
+      /* The Setup .exe lives on GitHub Releases (>25MB, never
+         committed to this repo). It is the ONLY download option. */
       badge.className = 'status status--dev';
       badge.innerHTML = '<span class="pulse-dot"></span> Pre-release build · via GitHub Releases';
       var sizeEl0 = $('#dl-size');
       if (sizeEl0) sizeEl0.textContent = 'Hosted on GitHub Releases';
-      note.innerHTML = 'The <strong>.zip</strong> is attached to a <strong>GitHub Release</strong> of this repo. ' +
-        'Download it, right-click → <em>Extract All…</em>, then run <code>' + appExeName() + '</code> from the extracted folder — ' +
-        'no installation needed. The button starts the download in the same tab. Pre-release build — expect bugs: ' +
+      var zipMode = isZipPackage();
+      note.innerHTML = 'The <strong>' + pkgExt() + '</strong> is attached to a <strong>GitHub Release</strong> of this repo. ' +
+        (zipMode
+          ? 'Download it, right-click → <em>Extract All…</em>, then run <code>' + appExeName() + '</code> from the extracted folder — no installation needed. '
+          : 'Run <code>' + decodeURIComponent((LW.releaseAssetName || activeDownloadHref()).split('/').pop()) + '</code> and follow the setup wizard — it installs Liánwǎng and adds a Start-menu shortcut. ') +
+        'The button starts the download in the same tab. Pre-release build — expect bugs: ' +
         '<a href="mailto:InnovationEarthProjects@gmail.com" style="color:var(--teal);text-decoration:underline">email us</a>.';
       btn.disabled = false;
       btn.innerHTML = btnLabel();
@@ -276,7 +278,9 @@
       if (heroNote) heroNote.innerHTML =
         '<i class="fas fa-triangle-exclamation" style="color:var(--warn)"></i> ' +
         'Pre-release build — the app is <strong>still in development</strong>. ' +
-        'Portable .zip hosted on GitHub Releases — extract and run, no installer.';
+        (zipMode
+          ? 'Portable .zip hosted on GitHub Releases — extract and run, no installer.'
+          : 'Setup .exe hosted on GitHub Releases — run the installer after downloading.');
     } else if (state === 'checking') {
       badge.className = 'status status--soon';
       badge.innerHTML = '<span class="dot dot--soon"></span> Checking…';
@@ -451,12 +455,13 @@
         return r.json();
       })
       .then(function (rel) {
-        /* The zip is the only package: prefer the configured asset name,
-           then any .zip. (.exe fallback kept for legacy releases.) */
+        /* The setup .exe is the only package: prefer the configured
+           asset name, then any .exe. (.zip fallback kept for legacy
+           releases in case you re-attach one.) */
         var assets = rel.assets || [];
         var hit = assets.filter(function (a) { return a.name === LW.releaseAssetName; })[0] ||
-                  assets.filter(function (a) { return /\.zip$/i.test(a.name); })[0] ||
-                  assets.filter(function (a) { return /\.exe$/i.test(a.name); })[0];
+                  assets.filter(function (a) { return /\.exe$/i.test(a.name); })[0] ||
+                  assets.filter(function (a) { return /\.zip$/i.test(a.name); })[0];
         if (hit && !LW.releaseDownloadUrl) {
           LW.releaseDownloadUrl = hit.browser_download_url;
           applyDownloadTargets();
@@ -483,7 +488,7 @@
         var note = $('#dl-note');
         if (note) {
           note.innerHTML = 'The download button points at this repo\'s <strong>latest GitHub Release</strong>. ' +
-            'No release with the portable <code>.zip</code> has been published yet — once you attach it to a ' +
+            'No release with the setup <code>.exe</code> has been published yet — once you attach it to a ' +
             '<a href="' + releaseLatestUrl() + '" style="color:var(--teal);text-decoration:underline">Release</a>, ' +
             'this page links straight to the file and shows its size. Pre-release build — the app is still in development.';
         }
