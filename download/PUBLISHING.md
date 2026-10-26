@@ -1,68 +1,43 @@
-# Publishing your installer (it's bigger than 25 MB — that's fine)
+# Publishing a new build (portable .zip = the only download option)
 
-GitHub blocks files over **25 MB** uploaded through the web "Add files" UI (and
-over **100 MB** even via git). A real Windows installer is almost always larger,
-so **do not commit it into this repo**. Host it as a **GitHub Release asset**
-instead — Releases allow files up to **2 GB** and are free for public repos.
+Liánwǎng ships as a single **portable .zip** attached to a GitHub Release.
+There is no Setup.exe and nothing lives in this folder — real builds exceed
+GitHub's 25 MB per-file repo limit, Releases accept assets up to 2 GB.
 
-## Option A — GitHub Releases (recommended, no size headaches)
+## Ship a new version
 
-1. Go to your repo → **Releases** → **Draft a new release**.
-2. Create tag `v1.1.0` (or your build's version).
-3. Drag `Lianwang-Setup-v1.1.0.exe` into the
-   *"Attach binaries by dropping them here"* box → **Publish release**.
-4. Open `js/lianwang.js` and edit the CONFIG block at the top:
-   ```js
-   useExternalRelease: true,   // <-- flip this
-   releaseDownloadUrl: '',     // optional: paste the asset URL
-                               // https://github.com/ykminmin8654/LianWang-Innovation-Earth-Projects/releases/download/v1.1.0/Lianwang-Setup-v1.1.0.exe
-   ```
-   If you leave `releaseDownloadUrl` empty, the site queries the GitHub API and
-   auto-links the `.exe` attached to your **latest** release.
-5. Commit/push that one-line change. Done — every download button now serves
-   the Release asset in the same tab (no pop-ups), and the badge shows
-   "Pre-release build · via GitHub Releases".
+1. Build the portable app folder (`Lianwang.exe` + data files) and zip it,
+   e.g. `Lianwang-v1.1.0-portable.zip`.
+2. Repo → **Releases** → **Draft a new release**:
+   - Tag: `v1.1.0` (bump per release)
+   - Tick **pre-release** while the app is in development
+   - Drag the zip into "attach binaries" → **Publish release**
+3. That's it for hosting. The site queries
+   `api.github.com/repos/ykminmin8654/LianWang-Innovation-Earth-Projects/releases/latest`,
+   finds the newest release's `.zip`, links both download buttons straight at
+   the asset and shows its real size automatically.
 
-The tiny placeholder `Lianwang-Setup-v1.1.0.exe` in this folder can stay (it's
-harmless, ~4 KB) or be deleted once `useExternalRelease: true`.
+## Optional config (`js/lianwang.js`, CONFIG block)
 
-## Option A2 — ship a portable .zip instead of an .exe (also fine!)
+| Key | Meaning |
+|---|---|
+| `useExternalRelease` | keep `true` — downloads come from Releases |
+| `releaseAssetName` | exact zip filename; helps pick the right asset if a release has several |
+| `releaseDownloadUrl` | paste the asset URL to pin one exact file (otherwise latest release wins) |
+| `version` | shown in nav/buttons — bump it with each release |
+| `inDevelopment` | master switch for all "still in development" banners; set `false` at launch |
 
-If you don't need a Setup wizard, zip the finished app folder and attach that
-instead — Releases accept .zip assets up to 2 GB just like .exe:
+If you rename the zip, update `releaseAssetName` (or leave it — the site still
+auto-finds any `.zip` in the latest release).
 
-1. Zip your build output (e.g. `Lianwang-v1.1.0-portable.zip` containing
-   `Lianwang.exe` and its data files).
-2. Attach it to the release exactly like step 3 of Option A.
-3. In `js/lianwang.js` set `releaseAssetName: 'Lianwang-v1.1.0-portable.zip'`
-   (or paste the zip's URL into `releaseDownloadUrl`). The site auto-detects
-   zips: buttons relabel to "Download v1.1.0 (.zip)", the note switches to
-   "extract and run" instructions, and the API check accepts `.zip` assets.
+## Before the first release is published
 
-Trade-offs vs an installer: users must right-click → Extract All before running,
-there's no Start-menu shortcut or uninstall entry, and Windows marks downloaded
-zips as blocked until "Unblock" is ticked. An unsigned .exe triggers SmartScreen
-anyway while pre-release, so a zip is a perfectly good stopgap — many users even
-prefer it. You can attach BOTH to the same release; the site prefers the exact
-`releaseAssetName`, then any .exe, then any .zip.
+Buttons point at `/releases/latest`; once a release exists GitHub redirects to
+it. Until then the page badge reads "Release not published yet" and the note
+explains how to publish — no broken file links inside the site itself.
 
-## Option B — keep it inside the repo (only if under 25 MB)
+## Why not commit the zip to the repo?
 
-Copy your built installer over `download/Lianwang-Setup-v1.1.0.exe` (keep the
-name). The page reads the file on load: as long as it still contains the marker
-string `LIANWANG-PLACEHOLDER-BINARY`, download buttons stay disabled; once
-replaced they activate automatically. If you rename it, update both
-`href="download/..."` in `index.html` and `downloadPath` in `js/lianwang.js`.
-
-## Option C — Git LFS (works, but usually worse)
-
-`git lfs track "*.exe"` lets big files live in the repo, but GitHub gives only
-~1 GB free storage/bandwidth per month for LFS and silently throttles after
-that. Releases have no such quota for public repos — prefer Option A.
-
-## Notes
-- The placeholder has a valid PE/MZ header so browsers treat it as an executable download.
-- To flip the site out of "in development" mode at launch, set `inDevelopment: false`
-  in `js/lianwang.js` (removes the ribbon, banner badges and the confirm dialog).
-- Same-tab policy: all links (including the Releases link) navigate in the current
-  tab; nothing uses `target="_blank"`.
+* Web editor blocks files > 25 MB; git hard-blocks > 100 MB.
+* Git LFS would work but has ~1 GB/month free quota and bloats clones.
+* Releases give per-asset stats, changelogs and a stable canonical URL.

@@ -15,32 +15,27 @@
   var LW = {
     version: '1.1.0',
     /* ---------------------------------------------------------------
-       HOW TO SHIP YOUR INSTALLER (it is too big for the web editor!)
+       SHIPPING MODEL (current): the portable .zip on GitHub Releases
+       is the ONLY download option. No .exe installer exists.
 
-       A real .exe is almost always over GitHub's 25 MB limit for the
-       "Add files" web upload (and over git's 100 MB hard block). So:
+       Why: the build exceeds GitHub's 25 MB per-file repo limit, so it
+       lives as a Release asset (Releases accept up to 2 GB). To ship a
+       new version:
+         1. Repo -> Releases -> Draft a new release -> attach the zip
+         2. Update `version`, `releaseTagName` and `releaseAssetName`
+            below (or leave releaseDownloadUrl empty and the site will
+            auto-detect the newest Release's zip via the GitHub API).
 
-       1. Upload the installer to GitHub Releases instead:
-            Repo -> Releases -> Draft a new release -> attach the .exe
-          then copy the asset URL it gives you (looks like
-          https://github.com/<you>/<repo>/releases/download/v1.1.0/....exe)
-       2. Paste that URL into `releaseDownloadUrl` below and set
-          `useExternalRelease` to true. Done - buttons now download
-          from Releases; nothing needs to live inside this repo.
-       3. Optional but recommended: also create a Release *tag* named
-          after `releaseTagName` and keep `useExternalRelease: false`,
-          so links point at github.com/.../releases/latest automatically.
-
-       Leave `useExternalRelease` false while testing with the local
-       placeholder file in /download.
+       `useExternalRelease: true` = download comes from Releases.
+       Setting it back to false only makes sense if you commit a small
+       test package under download/ again.
        --------------------------------------------------------------- */
-    downloadPath: 'download/Lianwang-Setup-v1.1.0.exe', // relative to site root (placeholder path)
-    useExternalRelease: false,   // true => link straight to GitHub Releases (for >25MB installers)
+    downloadPath: 'download/Lianwang-v1.1.0-portable.zip', // legacy local path (unused while external mode is on)
+    useExternalRelease: true,    // THE zip on GitHub Releases is the only download
     releaseRepo: 'ykminmin8654/LianWang-Innovation-Earth-Projects', // <owner>/<repo> of your Releases
-    releaseTagName: 'v1.1.0',    // tag of the release holding the installer (used by ?asset= fallback)
-    releaseAssetName: 'Lianwang-Setup-v1.1.0.exe', // exact filename attached to the release
-                                                    // (a .zip works too — e.g. Lianwang-v1.1.0-portable.zip)
-    releaseDownloadUrl: '',      // paste full asset URL here & set useExternalRelease:true
+    releaseTagName: 'v1.1.0',    // tag of the release holding the zip
+    releaseAssetName: 'Lianwang-v1.1.0-portable.zip', // exact zip filename attached to the release
+    releaseDownloadUrl: '',      // optional: paste the full asset URL to pin it exactly
     inDevelopment: true,        // master switch for all "in development" UI
     devProgress: 72             // % shown on the build-status bar
   };
@@ -61,11 +56,10 @@
   }
   function releaseDirectUrl() {
     if (LW.releaseDownloadUrl) return LW.releaseDownloadUrl;
-    if (LW.releaseTagName && LW.releaseAssetName) {
-      return 'https://github.com/' + LW.releaseRepo +
-        '/releases/download/' + encodeURIComponent(LW.releaseTagName.replace(/^v/, '')) +
-        '/' + encodeURIComponent(LW.releaseAssetName);
-    }
+    /* Prefer the "latest" *release page* over a guessed asset URL:
+       GitHub Pages can't byte-probe Releases, so we never ship a link
+       that might 404. checkReleaseStatus() replaces this with the real
+       asset URL as soon as the GitHub API confirms the zip exists. */
     return releaseLatestUrl();
   }
   function activeDownloadHref() {
@@ -249,23 +243,18 @@
         'Pre-release build — the app is <strong>still in development</strong>. Installer: ' +
         '<code>' + (LW.useExternalRelease ? 'GitHub Releases' : LW.downloadPath) + '</code>' + (extra || '');
     } else if (state === 'external') {
-      /* Package hosted on GitHub Releases (>25MB, never committed here).
-         Can be a .exe installer or a .zip portable — both work.
-         We can't byte-inspect it cross-origin, so trust the config flag. */
+      /* The portable .zip lives on GitHub Releases (>25MB, never
+         committed to this repo). It is the ONLY download option —
+         there is no .exe installer. */
       badge.className = 'status status--dev';
       badge.innerHTML = '<span class="pulse-dot"></span> Pre-release build · via GitHub Releases';
       var sizeEl0 = $('#dl-size');
       if (sizeEl0) sizeEl0.textContent = 'Hosted on GitHub Releases';
-      note.innerHTML = isZipPackage()
-        ? 'The portable <strong>.zip</strong> is attached to a <strong>GitHub Release</strong> of this repo ' +
-          '(it exceeds GitHub\'s 25&nbsp;MB per-file limit for repositories, so it does not live inside the site files). ' +
-          'Download it, right-click → <em>Extract All…</em>, then run <code>Lianwang.exe</code> from the folder — ' +
-          'no installation needed. The button opens the download in the same tab. Pre-release build — expect bugs: ' +
-          '<a href="mailto:InnovationEarthProjects@gmail.com" style="color:var(--teal);text-decoration:underline">email us</a>.'
-        : 'The real installer is attached to a <strong>GitHub Release</strong> of this repo ' +
-          '(it exceeds GitHub\'s 25&nbsp;MB per-file limit for repositories, so it does not live inside the site files). ' +
-          'The button opens the download in the same tab. Pre-release build — expect bugs: ' +
-          '<a href="mailto:InnovationEarthProjects@gmail.com" style="color:var(--teal);text-decoration:underline">email us</a>.';
+      note.innerHTML = 'The portable <strong>.zip</strong> is attached to a <strong>GitHub Release</strong> of this repo ' +
+        '(it exceeds GitHub\'s 25&nbsp;MB per-file limit for repositories, so it does not live inside the site files). ' +
+        'Download it, right-click → <em>Extract All…</em>, then run <code>Lianwang.exe</code> from the extracted folder — ' +
+        'no installation needed. The button starts the download in the same tab. Pre-release build — expect bugs: ' +
+        '<a href="mailto:InnovationEarthProjects@gmail.com" style="color:var(--teal);text-decoration:underline">email us</a>.';
       btn.disabled = false;
       btn.innerHTML = btnLabel();
       setDlDisabled(false);
@@ -273,7 +262,7 @@
       if (heroNote) heroNote.innerHTML =
         '<i class="fas fa-triangle-exclamation" style="color:var(--warn)"></i> ' +
         'Pre-release build — the app is <strong>still in development</strong>. ' +
-        'Package hosted on GitHub Releases' + (isZipPackage() ? ' (.zip — just extract and run).' : '.');
+        'Portable .zip hosted on GitHub Releases — extract and run, no installer.';
     } else if (state === 'checking') {
       badge.className = 'status status--soon';
       badge.innerHTML = '<span class="dot dot--soon"></span> Checking…';
@@ -448,11 +437,12 @@
         return r.json();
       })
       .then(function (rel) {
-        /* Accept the configured asset name exactly, then any .exe, then any .zip. */
+        /* The zip is the only package: prefer the configured asset name,
+           then any .zip. (.exe fallback kept for legacy releases.) */
         var assets = rel.assets || [];
         var hit = assets.filter(function (a) { return a.name === LW.releaseAssetName; })[0] ||
-                  assets.filter(function (a) { return /\.exe$/i.test(a.name); })[0] ||
-                  assets.filter(function (a) { return /\.zip$/i.test(a.name); })[0];
+                  assets.filter(function (a) { return /\.zip$/i.test(a.name); })[0] ||
+                  assets.filter(function (a) { return /\.exe$/i.test(a.name); })[0];
         if (hit && !LW.releaseDownloadUrl) {
           LW.releaseDownloadUrl = hit.browser_download_url;
           applyDownloadTargets();
@@ -473,6 +463,13 @@
         if (badge) {
           badge.className = 'status status--soon';
           badge.innerHTML = '<span class="dot dot--soon"></span> Release not published yet';
+        }
+        var note = $('#dl-note');
+        if (note) {
+          note.innerHTML = 'The download button points at this repo\'s <strong>latest GitHub Release</strong>. ' +
+            'No release with the portable <code>.zip</code> has been published yet — once you attach it to a ' +
+            '<a href="' + releaseLatestUrl() + '" style="color:var(--teal);text-decoration:underline">Release</a>, ' +
+            'this page links straight to the file and shows its size. Pre-release build — the app is still in development.';
         }
       });
   }
