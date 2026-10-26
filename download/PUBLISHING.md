@@ -26,6 +26,26 @@ instead — Releases allow files up to **2 GB** and are free for public repos.
 The tiny placeholder `Lianwang-Setup-v1.1.0.exe` in this folder can stay (it's
 harmless, ~4 KB) or be deleted once `useExternalRelease: true`.
 
+## Option A2 — ship a portable .zip instead of an .exe (also fine!)
+
+If you don't need a Setup wizard, zip the finished app folder and attach that
+instead — Releases accept .zip assets up to 2 GB just like .exe:
+
+1. Zip your build output (e.g. `Lianwang-v1.1.0-portable.zip` containing
+   `Lianwang.exe` and its data files).
+2. Attach it to the release exactly like step 3 of Option A.
+3. In `js/lianwang.js` set `releaseAssetName: 'Lianwang-v1.1.0-portable.zip'`
+   (or paste the zip's URL into `releaseDownloadUrl`). The site auto-detects
+   zips: buttons relabel to "Download v1.1.0 (.zip)", the note switches to
+   "extract and run" instructions, and the API check accepts `.zip` assets.
+
+Trade-offs vs an installer: users must right-click → Extract All before running,
+there's no Start-menu shortcut or uninstall entry, and Windows marks downloaded
+zips as blocked until "Unblock" is ticked. An unsigned .exe triggers SmartScreen
+anyway while pre-release, so a zip is a perfectly good stopgap — many users even
+prefer it. You can attach BOTH to the same release; the site prefers the exact
+`releaseAssetName`, then any .exe, then any .zip.
+
 ## Option B — keep it inside the repo (only if under 25 MB)
 
 Copy your built installer over `download/Lianwang-Setup-v1.1.0.exe` (keep the

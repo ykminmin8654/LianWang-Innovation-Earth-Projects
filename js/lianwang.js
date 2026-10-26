@@ -39,10 +39,22 @@
     releaseRepo: 'ykminmin8654/LianWang-Innovation-Earth-Projects', // <owner>/<repo> of your Releases
     releaseTagName: 'v1.1.0',    // tag of the release holding the installer (used by ?asset= fallback)
     releaseAssetName: 'Lianwang-Setup-v1.1.0.exe', // exact filename attached to the release
+                                                    // (a .zip works too — e.g. Lianwang-v1.1.0-portable.zip)
     releaseDownloadUrl: '',      // paste full asset URL here & set useExternalRelease:true
     inDevelopment: true,        // master switch for all "in development" UI
     devProgress: 72             // % shown on the build-status bar
   };
+
+  /* Display name for whatever you actually ship: ".exe" or ".zip".
+     Derived automatically from downloadPath / releaseAssetName. */
+  function pkgExt() {
+    var src = LW.useExternalRelease ? (LW.releaseDownloadUrl || LW.releaseAssetName) : LW.downloadPath;
+    return /\.zip$/i.test(src) ? '.zip' : '.exe';
+  }
+  function isZipPackage() { return pkgExt() === '.zip'; }
+  function btnLabel() {
+    return '<i class="fas fa-download"></i> Download v' + LW.version + ' (' + pkgExt() + ')';
+  }
 
   function releaseLatestUrl() {
     return 'https://github.com/' + LW.releaseRepo + '/releases/latest';
@@ -190,6 +202,13 @@
       // `download` attr only works same-origin; drop it for external URLs.
       if (LW.useExternalRelease) b.removeAttribute('download');
       else b.setAttribute('download', '');
+      // Keep static button captions in sync with the package type (.exe / .zip)
+      if (!b.classList.contains('is-disabled') && !b.disabled) b.innerHTML = btnLabel();
+    });
+    var fname = decodeURIComponent(href.split('/').pop());
+    ['#dl-filename', '#dl-filename-table'].forEach(function (sel) {
+      var el = $(sel);
+      if (el) el.textContent = fname;
     });
   }
 
@@ -213,7 +232,7 @@
       setDlDisabled(true);
       if (heroNote) heroNote.innerHTML =
         '<i class="fas fa-triangle-exclamation" style="color:var(--warn)"></i> ' +
-        'The app is <strong>still in development</strong> and the installer is a placeholder — ' +
+        'The app is <strong>still in development</strong> and the package is a placeholder — ' +
         'downloading unlocks when the real build is published (see the Download section).';
     } else if (state === 'ready') {
       badge.className = 'status status--dev';
@@ -222,7 +241,7 @@
         '<a href="mailto:InnovationEarthProjects@gmail.com" style="color:var(--teal);text-decoration:underline">email us</a>.' +
         (extra || '');
       btn.disabled = false;
-      btn.innerHTML = '<i class="fas fa-download"></i> Download v' + LW.version + ' (.exe)';
+      btn.innerHTML = btnLabel();
       setDlDisabled(false);
       applyDownloadTargets();
       if (heroNote) heroNote.innerHTML =
@@ -230,24 +249,31 @@
         'Pre-release build — the app is <strong>still in development</strong>. Installer: ' +
         '<code>' + (LW.useExternalRelease ? 'GitHub Releases' : LW.downloadPath) + '</code>' + (extra || '');
     } else if (state === 'external') {
-      /* Installer hosted on GitHub Releases (>25MB, never committed here).
+      /* Package hosted on GitHub Releases (>25MB, never committed here).
+         Can be a .exe installer or a .zip portable — both work.
          We can't byte-inspect it cross-origin, so trust the config flag. */
       badge.className = 'status status--dev';
       badge.innerHTML = '<span class="pulse-dot"></span> Pre-release build · via GitHub Releases';
       var sizeEl0 = $('#dl-size');
       if (sizeEl0) sizeEl0.textContent = 'Hosted on GitHub Releases';
-      note.innerHTML = 'The real installer is attached to a <strong>GitHub Release</strong> of this repo ' +
-        '(it exceeds GitHub\'s 25&nbsp;MB per-file limit for repositories, so it does not live inside the site files). ' +
-        'The button opens the download in the same tab. Pre-release build — expect bugs: ' +
-        '<a href="mailto:InnovationEarthProjects@gmail.com" style="color:var(--teal);text-decoration:underline">email us</a>.';
+      note.innerHTML = isZipPackage()
+        ? 'The portable <strong>.zip</strong> is attached to a <strong>GitHub Release</strong> of this repo ' +
+          '(it exceeds GitHub\'s 25&nbsp;MB per-file limit for repositories, so it does not live inside the site files). ' +
+          'Download it, right-click → <em>Extract All…</em>, then run <code>Lianwang.exe</code> from the folder — ' +
+          'no installation needed. The button opens the download in the same tab. Pre-release build — expect bugs: ' +
+          '<a href="mailto:InnovationEarthProjects@gmail.com" style="color:var(--teal);text-decoration:underline">email us</a>.'
+        : 'The real installer is attached to a <strong>GitHub Release</strong> of this repo ' +
+          '(it exceeds GitHub\'s 25&nbsp;MB per-file limit for repositories, so it does not live inside the site files). ' +
+          'The button opens the download in the same tab. Pre-release build — expect bugs: ' +
+          '<a href="mailto:InnovationEarthProjects@gmail.com" style="color:var(--teal);text-decoration:underline">email us</a>.';
       btn.disabled = false;
-      btn.innerHTML = '<i class="fas fa-download"></i> Download v' + LW.version + ' (.exe)';
+      btn.innerHTML = btnLabel();
       setDlDisabled(false);
       applyDownloadTargets();
       if (heroNote) heroNote.innerHTML =
         '<i class="fas fa-triangle-exclamation" style="color:var(--warn)"></i> ' +
         'Pre-release build — the app is <strong>still in development</strong>. ' +
-        'Installer hosted on GitHub Releases.';
+        'Package hosted on GitHub Releases' + (isZipPackage() ? ' (.zip — just extract and run).' : '.');
     } else if (state === 'checking') {
       badge.className = 'status status--soon';
       badge.innerHTML = '<span class="dot dot--soon"></span> Checking…';
@@ -422,17 +448,20 @@
         return r.json();
       })
       .then(function (rel) {
-        var hit = (rel.assets || []).filter(function (a) {
-          return a.name === LW.releaseAssetName || /\.exe$/i.test(a.name);
-        })[0];
+        /* Accept the configured asset name exactly, then any .exe, then any .zip. */
+        var assets = rel.assets || [];
+        var hit = assets.filter(function (a) { return a.name === LW.releaseAssetName; })[0] ||
+                  assets.filter(function (a) { return /\.exe$/i.test(a.name); })[0] ||
+                  assets.filter(function (a) { return /\.zip$/i.test(a.name); })[0];
         if (hit && !LW.releaseDownloadUrl) {
           LW.releaseDownloadUrl = hit.browser_download_url;
           applyDownloadTargets();
         }
+        if (hit) setDlState('external'); // refresh labels now that we know exe vs zip
         if (badge) {
           badge.className = 'status status--dev';
           badge.innerHTML = '<span class="pulse-dot"></span> Pre-release build · Release ' +
-            (rel.tag_name || '') + ' live';
+            (rel.tag_name || '') + ' live' + (isZipPackage() ? ' (.zip)' : '');
         }
         var sizeEl = $('#dl-size');
         if (sizeEl && hit) {

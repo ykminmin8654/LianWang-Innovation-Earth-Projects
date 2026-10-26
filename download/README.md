@@ -14,6 +14,11 @@ the Release asset directly; nothing large ever gets committed to this repo.
    into `releaseDownloadUrl`; otherwise the site auto-detects the latest .exe).
 3. Push. Buttons activate automatically, still same-tab.
 
+## Can I use a .zip instead of an .exe?
+Yes — attach a portable `Lianwang-v1.1.0-portable.zip` to a GitHub Release and
+set `releaseAssetName` to it in `js/lianwang.js`. The site detects zips and
+updates all labels/instructions automatically. See PUBLISHING.md, Option A2.
+
 ## If your installer happens to be under 25 MB
 1. Copy your built installer over this file (keep the name), e.g.
    `copy Lianwang-Setup-1.1.0.exe download\Lianwang-Setup-v1.1.0.exe`
