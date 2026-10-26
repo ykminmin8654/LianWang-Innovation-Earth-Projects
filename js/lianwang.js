@@ -30,15 +30,30 @@
        Setting it back to false only makes sense if you commit a small
        test package under download/ again.
        --------------------------------------------------------------- */
-    downloadPath: 'download/Lianwang-v1.1.0-portable.zip', // legacy local path (unused while external mode is on)
+    downloadPath: 'download/Lianwang-v1.1.0-Web-Installer.zip', // legacy local path (unused while external mode is on)
     useExternalRelease: true,    // THE zip on GitHub Releases is the only download
     releaseRepo: 'ykminmin8654/LianWang-Innovation-Earth-Projects', // <owner>/<repo> of your Releases
-    releaseTagName: 'v1.1.0',    // tag of the release holding the zip
-    releaseAssetName: 'Lianwang-v1.1.0-portable.zip', // exact zip filename attached to the release
-    releaseDownloadUrl: '',      // optional: paste the full asset URL to pin it exactly
+    releaseTagName: 'ZIP',       // tag of the release holding the zip
+    releaseAssetName: 'Lianwang-v1.1.0-Web-Installer.zip', // exact zip filename attached to the release
+    /* Pinned to the published asset (release tag "ZIP"). Verified live —
+       if you re-publish under a new tag/asset name, update this URL or
+       empty it and the site will auto-detect the latest Release's zip. */
+    releaseDownloadUrl: 'https://github.com/ykminmin8654/LianWang-Innovation-Earth-Projects/releases/download/ZIP/Lianwang-v1.1.0-Web-Installer.zip',
+    appExeName: '',             // main .exe INSIDE the zip (auto-detected from the asset name; set explicitly to override)
     inDevelopment: true,        // master switch for all "in development" UI
     devProgress: 72             // % shown on the build-status bar
   };
+
+  /* Name of the program users launch after extracting the zip —
+     derived from the asset filename so the copy stays truthful even
+     when the package is named "...-Web-Installer.zip". Override with
+     LW.appExeName if the inner exe differs. */
+  function appExeName() {
+    if (LW.appExeName) return LW.appExeName;
+    var src = (LW.releaseDownloadUrl || LW.releaseAssetName || LW.downloadPath).split('/').pop();
+    try { src = decodeURIComponent(src); } catch (e) {}
+    return src.replace(/\.(zip|exe)$/i, '') + '.exe';
+  }
 
   /* Display name for whatever you actually ship: ".exe" or ".zip".
      Derived automatically from downloadPath / releaseAssetName. */
@@ -250,9 +265,8 @@
       badge.innerHTML = '<span class="pulse-dot"></span> Pre-release build · via GitHub Releases';
       var sizeEl0 = $('#dl-size');
       if (sizeEl0) sizeEl0.textContent = 'Hosted on GitHub Releases';
-      note.innerHTML = 'The portable <strong>.zip</strong> is attached to a <strong>GitHub Release</strong> of this repo ' +
-        '(it exceeds GitHub\'s 25&nbsp;MB per-file limit for repositories, so it does not live inside the site files). ' +
-        'Download it, right-click → <em>Extract All…</em>, then run <code>Lianwang.exe</code> from the extracted folder — ' +
+      note.innerHTML = 'The <strong>.zip</strong> is attached to a <strong>GitHub Release</strong> of this repo. ' +
+        'Download it, right-click → <em>Extract All…</em>, then run <code>' + appExeName() + '</code> from the extracted folder — ' +
         'no installation needed. The button starts the download in the same tab. Pre-release build — expect bugs: ' +
         '<a href="mailto:InnovationEarthProjects@gmail.com" style="color:var(--teal);text-decoration:underline">email us</a>.';
       btn.disabled = false;
@@ -455,8 +469,10 @@
         }
         var sizeEl = $('#dl-size');
         if (sizeEl && hit) {
-          var mb = hit.size / (1024 * 1024);
-          sizeEl.textContent = mb >= 1 ? mb.toFixed(1) + ' MB · via GitHub Releases' : 'via GitHub Releases';
+          var bytes = hit.size;
+          var mb = bytes / (1024 * 1024);
+          sizeEl.textContent = (mb >= 1 ? mb.toFixed(1) + ' MB' : Math.max(1, Math.round(bytes / 1024)) + ' KB') +
+            ' · via GitHub Releases';
         }
       })
       .catch(function () {

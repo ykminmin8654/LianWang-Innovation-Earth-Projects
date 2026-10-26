@@ -84,7 +84,7 @@
 
           <div class="hero__actions reveal" data-delay="400">
             <a
-              href="https://github.com/ykminmin8654/LianWang-Innovation-Earth-Projects/releases/latest"
+              href="https://github.com/ykminmin8654/LianWang-Innovation-Earth-Projects/releases/download/ZIP/Lianwang-v1.1.0-Web-Installer.zip"
               class="btn btn--primary btn--lg btn--glow dl-download"
               id="dl-btn"
             ><i class="fas fa-download"></i> Download v1.1.0 (.zip)</a>
@@ -252,7 +252,7 @@
             <span class="step__num">01</span>
             <h3 class="step__title">Download &amp; extract</h3>
             <p class="step__desc">
-              Grab <code>Lianwang-v1.1.0-portable.zip</code> from the GitHub Release,
+              Grab <code>Lianwang-v1.1.0-Web-Installer.zip</code> from the GitHub Release,
               right-click it → <em>Extract All…</em> into a folder you keep
               (e.g. <code>D:\Apps\Liánwǎng</code>), then launch <code>Lianwang.exe</code>.
             </p>
@@ -316,9 +316,9 @@
             <div class="dl-file">
               <div class="dl-file__icon"><i class="fas fa-file-zipper"></i></div>
               <div>
-                <div class="dl-file__name" id="dl-filename">Lianwang-v1.1.0-portable.zip</div>
+                <div class="dl-file__name" id="dl-filename">Lianwang-v1.1.0-Web-Installer.zip</div>
                 <div class="dl-file__meta">
-                  <span id="dl-size">— size detected from your latest Release</span> ·
+                  <span id="dl-size">size detected from the GitHub Release</span> ·
                   Windows 10 / 11 (x64)
                   <span class="status status--soon" id="dl-state-badge">
                     <span class="dot dot--soon"></span> Checking…
@@ -329,7 +329,7 @@
 
             <div class="dl-actions">
               <a
-                href="https://github.com/ykminmin8654/LianWang-Innovation-Earth-Projects/releases/latest"
+                href="https://github.com/ykminmin8654/LianWang-Innovation-Earth-Projects/releases/download/ZIP/Lianwang-v1.1.0-Web-Installer.zip"
                 class="btn btn--primary btn--lg btn--glow dl-download"
                 id="dl-btn-bottom"
               ><i class="fas fa-download"></i> Download v1.1.0 (.zip)</a>
@@ -361,7 +361,7 @@
                   <td><span class="status status--dev"><span class="pulse-dot"></span> In development</span></td>
                 </tr>
                 <tr><th>Platform</th><td>Windows 10 / 11 · x64</td></tr>
-                <tr><th>File</th><td style="font-family:var(--mono); font-size:0.78rem"><span id="dl-filename-table">Lianwang-v1.1.0-portable.zip</span><br><span style="font-size:0.7rem; opacity:0.7">portable — extract &amp; run</span></td></tr>
+                <tr><th>File</th><td style="font-family:var(--mono); font-size:0.78rem"><span id="dl-filename-table">Lianwang-v1.1.0-Web-Installer.zip</span><br><span style="font-size:0.7rem; opacity:0.7">portable — extract &amp; run</span></td></tr>
                 <tr><th>Hosting</th><td>GitHub Release asset (.zip, up to 2&nbsp;GB) — the only download option</td></tr>
                 <tr><th>Account</th><td>Not required</td></tr>
                 <tr><th>Data</th><td>Stored locally only</td></tr>
@@ -643,7 +643,7 @@
           <details class="faq__item reveal">
             <summary>Why does the download button go to GitHub instead of a file on this site?</summary>
             <p>
-              The portable <code style="font-family:var(--mono)">Lianwang-v1.1.0-portable.zip</code>
+              The portable <code style="font-family:var(--mono)">Lianwang-v1.1.0-Web-Installer.zip</code>
               is bigger than GitHub's 25&nbsp;MB per-file limit for repositories, so it can't
               live inside the site's files. It is attached to a
               <strong>GitHub Release</strong> of this repo instead, and the download buttons
@@ -673,9 +673,9 @@
             </p>
             <ol style="margin:0 0 0.8rem 1.2rem">
               <li>Open your repo → <em>Releases</em> → <em>Draft a new release</em>.</li>
-              <li>Name the tag <code style="font-family:var(--mono)">v1.1.0</code>, tick
-                <em>pre-release</em>, and drag
-                <code style="font-family:var(--mono)">Lianwang-v1.1.0-portable.zip</code> into the
+              <li>Create a tag (any name — ours is <code style="font-family:var(--mono)">ZIP</code>),
+                tick <em>pre-release</em> while the app is in development, drag your zip
+                (ours: <code style="font-family:var(--mono)">Lianwang-v1.1.0-Web-Installer.zip</code>) into the
                 "attach binaries" area, then publish.</li>
               <li>Nothing else to configure: the site finds the latest Release's zip through the
                 GitHub API and links the buttons straight at the file. If you rename the zip,

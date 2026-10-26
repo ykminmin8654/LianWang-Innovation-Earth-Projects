@@ -7,7 +7,7 @@ GitHub's 25 MB per-file repo limit, Releases accept assets up to 2 GB.
 ## Ship a new version
 
 1. Build the portable app folder (`Lianwang.exe` + data files) and zip it,
-   e.g. `Lianwang-v1.1.0-portable.zip`.
+   e.g. `Lianwang-v1.1.0-Web-Installer.zip`.
 2. Repo → **Releases** → **Draft a new release**:
    - Tag: `v1.1.0` (bump per release)
    - Tick **pre-release** while the app is in development

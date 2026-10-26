@@ -1,7 +1,7 @@
 # Download folder — retired
 
 There is **no package file in this folder anymore**. The portable
-`Lianwang-v1.1.0-portable.zip` (the app's only download option) is too big for
+`Lianwang-v1.1.0-Web-Installer.zip` (the app's only download option) is too big for
 GitHub's 25 MB per-file repo limit, so it is hosted as a **GitHub Release
 asset** instead:
 
