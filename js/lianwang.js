@@ -41,6 +41,7 @@
        auto-detect the latest Release's .exe. */
     releaseDownloadUrl: 'https://github.com/ykminmin8654/LianWang-Innovation-Earth-Projects/releases/download/install/Lianwang-Setup-1.1.1.exe',
     appExeName: '',             // display name of the program (derived from the asset name; set explicitly to override)
+    mainSiteUrl: 'https://innovationearthprojects.org', // the ORIGINAL website — every "back to site" link points here, same tab
     inDevelopment: true,        // master switch for all "in development" UI
     devProgress: 72             // % shown on the build-status bar
   };
@@ -100,6 +101,16 @@
     { href: '#faq',        label: 'FAQ',        key: 'faq' }
   ];
 
+  /* "Back to the main website" link — ALWAYS same tab (no target=_blank;
+     enforceSameTab() additionally strips strays and routes the click via
+     window.location.href). */
+  function backToSitePill(extraClass) {
+    return '<a href="' + LW.mainSiteUrl + '" data-external class="back-to-site' +
+      (extraClass ? ' ' + extraClass : '') + '" title="Back to innovationearthprojects.org (opens in this tab)">' +
+      '<i class="fas fa-arrow-left" aria-hidden="true"></i>' +
+      '<span>Innovation Earth Projects</span></a>';
+  }
+
   function buildNav() {
     var mount = $('#nav-mount');
     if (!mount) return;
@@ -120,6 +131,7 @@
           '<span class="nav__version">v' + LW.version + ' · dev</span>' +
         '</a>' +
         '<nav class="nav__links" id="primary-nav" aria-label="Primary">' + links + '</nav>' +
+        backToSitePill('nav__back') +
         '<a href="#download" class="btn btn--ghost nav__cta shine">Download <i class="fas fa-download"></i></a>' +
         '<button class="nav__toggle" id="nav-toggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="primary-nav">' +
           '<i class="fas fa-bars"></i></button>' +
@@ -154,9 +166,13 @@
           '<li><a href="#development">What\'s shipping</a></li>' +
         '</ul></div>' +
         '<div class="footer__col"><h4>Studio</h4><ul>' +
-          '<li><a href="https://innovationearthprojects.org" data-external>Innovation Earth Projects <i class="fas fa-arrow-up-right-from-square"></i></a></li>' +
+          '<li><a href="' + LW.mainSiteUrl + '" data-external title="Back to the main website — opens in this tab">Innovation Earth Projects <i class="fas fa-arrow-left"></i></a></li>' +
           '<li><a href="mailto:InnovationEarthProjects@gmail.com"><i class="fas fa-envelope"></i> Email us</a></li>' +
         '</ul></div>' +
+      '</div>' +
+      '<div class="container footer__back">' +
+        backToSitePill('footer__back-pill') +
+        '<span class="footer__back-note">This page is the Liánwǎng download site — the link above returns you to the main website (same tab, no pop-ups).</span>' +
       '</div>' +
       '<div class="container footer__bottom">' +
         '<span>&copy; <span id="footer-year"></span> Innovation Earth Projects LLC &middot; Utah, USA</span>' +
